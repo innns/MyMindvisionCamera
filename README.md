@@ -1,2 +1,2 @@
-# Mindvision_AR_Show
+# Mindvision Camera C++ Class
  
