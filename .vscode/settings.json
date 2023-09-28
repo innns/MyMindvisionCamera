@@ -1,0 +1,10 @@
+{
+    "C_Cpp.default.compilerPath": "c:\\Program Files\\CodeBlocks\\MinGW\\bin\\x86_64-w64-mingw32-g++.exe",
+    "files.associations": {
+        "*.m": "matlab",
+        "cstddef": "cpp",
+        "*.tcc": "cpp",
+        "memory_resource": "cpp",
+        "type_traits": "cpp"
+    }
+}
