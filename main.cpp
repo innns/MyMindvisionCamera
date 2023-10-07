@@ -18,7 +18,7 @@ int main() {
         }
 
 
-        Mat img1, img2;
+        Mat img1, img2,img_1,img_2;
 //        cout << "ok\n";
         Cam1.retrieve(img1);
         Cam2.retrieve(img2);
@@ -26,11 +26,12 @@ int main() {
 
         if (img1.empty())
             continue;
-        resize(img1, img1, Size(1280, 512));
-        resize(img2, img2, Size(1280, 512));
+        resize(img1, img_1, Size(1280, 512));
+        resize(img2, img_2, Size(1280, 512));
 
-        imshow("111", img1);
-        imshow("222", img2);
+        imshow("111", img_1);
+        imshow("222", img_2);
+
         int k = waitKey(5);
         switch (k) {
             case 27:
@@ -43,6 +44,8 @@ int main() {
             default:
                 break;
         }
+
+
 
     }
 

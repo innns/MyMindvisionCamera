@@ -82,13 +82,13 @@ MyMindvisionCamera::MyMindvisionCamera(int _id)
     CameraSetFrameSpeed(hCamera, 2);//设置为高速模式。
     CameraSetAeState(hCamera, false);
     if(channel == 1){
-        CameraSetExposureTime(hCamera, 7000); //单位us
+        CameraSetExposureTime(hCamera, 15000); //单位us
         CameraSetAnalogGain(hCamera, 3); //模拟增益倍数
         // CameraSetContrast(hCamera, 150); //对比度越大，会使图像黑的区域越黑，白的区域越白
     }
     else{
-        CameraSetExposureTime(hCamera, 30000); //单位us
-        CameraSetAnalogGain(hCamera, 3); //模拟增益倍数
+        CameraSetExposureTime(hCamera, 40000); //单位us
+        CameraSetAnalogGain(hCamera, 5); //模拟增益倍数
         // CameraSetContrast(hCamera, 150); //对比度越大，会使图像黑的区域越黑，白的区域越白
     }
     initCamera = true;
