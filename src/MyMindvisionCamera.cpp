@@ -37,14 +37,6 @@ MyMindvisionCamera::MyMindvisionCamera(int _id)
     }
     // 相机初始化。初始化成功后，才能调用任何其他相机相关的操作接口
     iStatus = CameraInit(&tCameraEnumList[iCameraId], -1, -1, &hCamera);
-    // 设置为手动曝光,设置曝光时间、模拟增益、伽马值和对比度
-    // TODO:设置相机参数
-    //  zx edit: 使用 CameraInit(&tCameraEnumList[iCameraId], -1, -1, &hCamera); 会保存上一次的参数
-    // CameraSetFrameSpeed(hCamera, 2);//设置为高速模式。
-    // CameraSetAeState(hCamera, false);
-    // CameraSetExposureTime(hCamera, 5000); //单位us
-    // CameraSetAnalogGain(hCamera, 2); //模拟增益倍数
-    // CameraSetContrast(hCamera, 150); //对比度越大，会使图像黑的区域越黑，白的区域越白
     // 初始化失败
     if (iStatus != CAMERA_STATUS_SUCCESS)
     {
@@ -54,7 +46,10 @@ MyMindvisionCamera::MyMindvisionCamera(int _id)
 
     // 获得相机的特性描述结构体。该结构体中包含了相机可设置的各种参数的范围信息。决定了相关函数的参数
     CameraGetCapability(hCamera, &tCapability);
-    g_pRgbBuffer = (unsigned char *)malloc(tCapability.sResolutionRange.iHeightMax * tCapability.sResolutionRange.iWidthMax * 3);
+    // TODO 原本应该是 g_pRgbBuffer = (BYTE *)CameraAlignMalloc(tCapability.sResolutionRange.iHeightMax * tCapability.sResolutionRange.iWidthMax * 3, 16)
+    // 但是不知道为什么tmd有问题
+
+    g_pRgbBuffer = (BYTE *)CameraAlignMalloc(tCapability.sResolutionRange.iHeightMax * tCapability.sResolutionRange.iWidthMax * 6,8);
     /*让SDK进入工作模式，开始接收来自相机发送的图像
     数据。如果当前相机是触发模式，则需要接收到
     触发帧以后才会更新图像。    */
@@ -81,6 +76,21 @@ MyMindvisionCamera::MyMindvisionCamera(int _id)
         channel = 3;
         CameraSetIspOutFormat(hCamera, CAMERA_MEDIA_TYPE_BGR8);
     }
+    // 设置为手动曝光,设置曝光时间、模拟增益、伽马值和对比度
+    // TODO:设置相机参数
+    //  zx edit: 使用 CameraInit(&tCameraEnumList[iCameraId], -1, -1, &hCamera); 会保存上一次的参数
+    CameraSetFrameSpeed(hCamera, 2);//设置为高速模式。
+    CameraSetAeState(hCamera, false);
+    if(channel == 1){
+        CameraSetExposureTime(hCamera, 7000); //单位us
+        CameraSetAnalogGain(hCamera, 3); //模拟增益倍数
+        // CameraSetContrast(hCamera, 150); //对比度越大，会使图像黑的区域越黑，白的区域越白
+    }
+    else{
+        CameraSetExposureTime(hCamera, 30000); //单位us
+        CameraSetAnalogGain(hCamera, 3); //模拟增益倍数
+        // CameraSetContrast(hCamera, 150); //对比度越大，会使图像黑的区域越黑，白的区域越白
+    }
     initCamera = true;
 }
 
@@ -91,7 +101,7 @@ MyMindvisionCamera::~MyMindvisionCamera()
 
 bool MyMindvisionCamera::grab()
 {
-    return (initCamera) ? (CameraGetImageBuffer(hCamera, &sFrameInfo, &pbyBuffer, 1000) == CAMERA_STATUS_SUCCESS) : false;
+    return (initCamera) && (CameraGetImageBuffer(hCamera, &sFrameInfo, &pbyBuffer, 1000) == CAMERA_STATUS_SUCCESS);
 }
 
 bool MyMindvisionCamera::retrieve(cv::Mat &_img)
@@ -103,9 +113,11 @@ bool MyMindvisionCamera::retrieve(cv::Mat &_img)
         CameraSetMirror(hCamera, 0, 0);                      // 图像镜像
         cv::Mat matImage(
             Size(sFrameInfo.iWidth, sFrameInfo.iHeight),
-            sFrameInfo.uiMediaType == CAMERA_MEDIA_TYPE_MONO8 ? CV_8UC1 : CV_8UC3,
+            channel == 1 ? CV_8UC1 : CV_8UC3,
             g_pRgbBuffer);
-        cvtColor(matImage, _img, cv::COLOR_RGB2BGR); // 缓冲区图像格式为RGB, 需改为opencv常用的BGR
+        _img = matImage;
+        // NOTE: 现在不用换BGR了 原本就是正常的
+//        cvtColor(matImage, _img, cv::COLOR_RGB2BGR); // 缓冲区图像格式为RGB, 需改为opencv常用的BGR
         // 在成功调用CameraGetImageBuffer后，必须调用CameraReleaseImageBuffer来释放获得的buffer。
         // 否则再次调用CameraGetImageBuffer时，程序将被挂起一直阻塞，直到其他线程中调用CameraReleaseImageBuffer来释放了buffer
         CameraReleaseImageBuffer(hCamera, pbyBuffer);
@@ -123,7 +135,7 @@ bool MyMindvisionCamera::read(cv::Mat &_img)
     return (grab()) ? (retrieve(_img)) : false;
 }
 
-bool MyMindvisionCamera::isOpened();
+bool MyMindvisionCamera::isOpened()
 {
     return initCamera;
 }

@@ -9,8 +9,8 @@
 #include <iostream>
 #include <math.h>
 #include <time.h>
-#include <iostream>
-#include "CameraApi.h"
+#include <windows.h>
+#include <CameraApi.h>
 
 using namespace std;
 using namespace cv;
@@ -40,7 +40,7 @@ private:
     tSdkCameraCapbility tCapability; // 设备描述信息
     tSdkFrameHead sFrameInfo;
     BYTE *pbyBuffer;
-    unsigned char *g_pRgbBuffer; // 处理后数据缓存区
+    BYTE *g_pRgbBuffer; // 处理后数据缓存区
     char g_CameraName[64];
 };
 
