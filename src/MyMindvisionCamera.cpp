@@ -83,8 +83,8 @@ MyMindvisionCamera::MyMindvisionCamera(int _id) {
         CameraSetAnalogGain(hCamera, 3); //模拟增益倍数
         // CameraSetContrast(hCamera, 150); //对比度越大，会使图像黑的区域越黑，白的区域越白
     } else {
-        CameraSetExposureTime(hCamera, 40000); //单位us
-        CameraSetAnalogGain(hCamera, 5); //模拟增益倍数
+        CameraSetExposureTime(hCamera, 10000); //单位us
+        CameraSetAnalogGain(hCamera, 2); //模拟增益倍数
         // CameraSetContrast(hCamera, 150); //对比度越大，会使图像黑的区域越黑，白的区域越白
     }
     initCamera = true;
